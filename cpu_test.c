@@ -51,6 +51,7 @@ int main(int argc, char const *argv[])
 {
 	int pid, wpid;
 	printf(1, "--------------------cpu type test start!-----------------------------\n" );
+	int start = uptime();
 	for (int i = 0; i < times; ++i)
 	{
 	    pid = fork();
@@ -66,7 +67,10 @@ int main(int argc, char const *argv[])
 	      printf(1, "zombie!\n");
 			
 	}
-	printf(1, "--------------------cpu type test start!-----------------------------\n" );
+	int end = uptime();
+	int pass = end-start ;
+	printf(1, "--------------------cpu type test end!-----------------------------\n---------------pass %dms--------------", pass*10);
+
 	exit();
 }
 

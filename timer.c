@@ -7,6 +7,8 @@
 #include "traps.h"
 #include "x86.h"
 
+ulong times = 0;
+
 #define IO_TIMER1       0x040           // 8253 Timer #1
 
 // Frequency of all three count-down timers;
