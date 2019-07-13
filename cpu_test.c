@@ -69,7 +69,8 @@ int main(int argc, char const *argv[])
 	}
 	int end = uptime();
 	int pass = end-start ;
-	printf(1, "--------------------cpu type test end!-----------------------------\n---------------pass %dms--------------", pass*10);
+	printf(1, "--------------------cpu type test end!-----------------------------\n");
+	printf(1, "---------------pass %dms--------------", pass*10);
 
 	exit();
 }
