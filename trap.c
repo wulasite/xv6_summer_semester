@@ -54,6 +54,7 @@ trap(struct trapframe *tf)
       wakeup(&ticks);
       release(&tickslock);
     }
+
     lapiceoi();
     break;
   case T_IRQ0 + IRQ_IDE:
@@ -100,10 +101,13 @@ trap(struct trapframe *tf)
   if(proc && proc->killed && (tf->cs&3) == DPL_USER)
     exit();
 
-  // Force process to give up CPU on clock tick.
-  // If interrupts were on while locks held, would need to check nlock.
-  if(proc && proc->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER)
+  //Increment the process's runtime at every clock tick and check to see if preemption needs to occur by calling yield
+  //If interrupts were on while locks held, would need to check nlock.
+  if(proc && proc->state == RUNNING && tf->trapno == T_IRQ0+IRQ_TIMER){
+    proc->currentRuntime = proc->currentRuntime + 1;
+
     yield();
+  }
 
   // Check if the process has been killed since we yielded
   if(proc && proc->killed && (tf->cs&3) == DPL_USER)

@@ -4,6 +4,7 @@ struct file;
 struct inode;
 struct pipe;
 struct proc;
+struct rtcdate;
 struct spinlock;
 struct stat;
 struct superblock;
@@ -71,6 +72,7 @@ void            kinit2(void*, void*);
 void            kbdintr(void);
 
 // lapic.c
+void            cmostime(struct rtcdate *r);
 int             cpunum(void);
 extern volatile uint*    lapic;
 void            lapiceoi(void);
@@ -81,8 +83,8 @@ void            microdelay(int);
 // log.c
 void            initlog(void);
 void            log_write(struct buf*);
-void            begin_trans();
-void            commit_trans();
+void            begin_op();
+void            end_op();
 
 // mp.c
 extern int      ismp;

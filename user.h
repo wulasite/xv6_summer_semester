@@ -1,4 +1,5 @@
 struct stat;
+struct rtcdate;
 
 // system calls
 int fork(void);
@@ -36,5 +37,3 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
-
-
