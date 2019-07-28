@@ -81,11 +81,13 @@ calculateWeight(int nice){
   if(nice > 30){
 	nice = 30;
   }
+  // cprintf("%d", nice);
   
   //While loop to calculate (1.25 ^ nice value) for denominator of formula to find weight. 
   int iterator = 0;
   while (iterator < nice && nice > 0){
   	denominator = denominator * 1.25;
+  	// cprintf("%d", iterator);
   }
 
   return (int) (1024/denominator);
@@ -206,7 +208,7 @@ rotateRight(struct redblackTree* tree, struct proc* positionProc){
 */
 struct proc*
 setMinimumVRuntimeproc(struct proc* traversingProcess){
-	
+  // 从最左下去直到NULL
   if(traversingProcess != 0){
 	if(traversingProcess->left != 0){
 	    return setMinimumVRuntimeproc(traversingProcess->left);
@@ -258,6 +260,7 @@ insertionCases(struct redblackTree* tree, struct proc* rbProcess, int cases){
 	
   switch(cases){
   case 1:
+  	// 根节点必须是黑的
 	if(rbProcess->parentP == 0)
 		rbProcess->coloring = BLACK;
 	else
@@ -300,7 +303,7 @@ insertionCases(struct redblackTree* tree, struct proc* rbProcess, int cases){
 	grandparent = 0;
 	break;
 	
-  case 5:
+	case 5:
     grandparent = retrieveGrandparentproc(rbProcess);
 	
 	if(grandparent != 0){
@@ -333,17 +336,16 @@ insertProcess(struct redblackTree* tree, struct proc* p){
 		tree->root->parentP = 0;
     tree->count += 1;
 	
-	//Calculate process weight
+	// 计算p的权重 这里用不到 不区分进程类别
 	p->weightValue = calculateWeight(p->niceValue);
 
-	//perform total weight calculation 
+	// 红黑树的总权重
 	tree->rbTreeWeight += p->weightValue;
 	
-    	//Check for possible cases for Red Black tree property violations
+    // 检查红黑树属性违规的可能情况
 	insertionCases(tree, p, 1);
 		
-	//This function call will find the process with the smallest vRuntime, unless 
-	//there was no insertion of a process that has a smaller minimum virtual runtime then the process that is being pointed by min_vRuntime
+	
 	if(tree->min_vRuntime == 0 || tree->min_vRuntime->left != 0)
 		tree->min_vRuntime = setMinimumVRuntimeproc(tree->root);
 	 
@@ -475,11 +477,11 @@ retrieveProcess(struct redblackTree* tree){
   		release(&tree->lock);
 		return 0;
 	}
-
+	// 此函数将检查是否违反了红黑树，以确保在从树中删除进程时树属性不会被破坏。
 	retrievingCases(tree, tree->min_vRuntime->parentP, tree->min_vRuntime, 1);
 	tree->count -= 1;
 
-	// 找出最小的vruntime
+	// 设置树的最小的vruntime
 	tree->min_vRuntime = setMinimumVRuntimeproc(tree->root);
 
 	// 计算process的运行时间
@@ -629,7 +631,7 @@ userinit(void)
 
   p->state = RUNNABLE;
 
-  //Insert allocated process into the red black tree, which will become runnable, i.e its state will be set to runnable, after this function returns to the caller.
+  // 把分配好的进程插入到runnableTasks(红黑树)
   insertProcess(runnableTasks, p);
 }
 
@@ -694,7 +696,7 @@ fork(void)
   np->state = RUNNABLE;
   release(&ptable.lock);
 
-  //Insert allocated process into the red black tree, which will become runnable, i.e its state will be set to runnable, after this function returns to the caller.
+  // 把分配好的进程插入到runnableTasks(红黑树)
   insertProcess(runnableTasks, np);
   
   return pid;
@@ -808,12 +810,11 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     
-    //Select process from red black tree, i.e readyTree
+    //Select process from red black tree
     p = retrieveProcess(runnableTasks);
     while(p != 0){
 
-	if(p->state == RUNNABLE){
-			
+		if(p->state == RUNNABLE){
       		// Switch to chosen process.  It is the process's job
       		// to release ptable.lock and then reacquire it
       		// before jumping back to us.
@@ -822,14 +823,12 @@ scheduler(void)
       		p->state = RUNNING;
       		swtch(&cpu->scheduler, proc->context);
       		switchkvm();
-			
       		// Process is done running for now.
       		// It should have changed its p->state before coming back.
       		proc = 0;
+		} 
 
-	} 
-
-	p = retrieveProcess(runnableTasks);
+		p = retrieveProcess(runnableTasks);
     }
     release(&ptable.lock);
 
