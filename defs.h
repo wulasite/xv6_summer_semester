@@ -4,9 +4,11 @@ struct file;
 struct inode;
 struct pipe;
 struct proc;
+struct rtcdate;
 struct spinlock;
 struct stat;
 struct superblock;
+struct semaphore;
 
 // bio.c
 void            binit(void);
@@ -71,6 +73,7 @@ void            kinit2(void*, void*);
 void            kbdintr(void);
 
 // lapic.c
+void            cmostime(struct rtcdate *r);
 int             cpunum(void);
 extern volatile uint*    lapic;
 void            lapiceoi(void);
@@ -81,8 +84,8 @@ void            microdelay(int);
 // log.c
 void            initlog(void);
 void            log_write(struct buf*);
-void            begin_trans();
-void            commit_trans();
+void            begin_op();
+void            end_op();
 
 // mp.c
 extern int      ismp;
@@ -116,6 +119,8 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int             clone(void*, void*, void*);
+int             join(void**);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -176,6 +181,13 @@ void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+
+//semaphore.c
+void            seminit(void);
+int             sem_init(int, int);
+int             sem_destroy(int);
+int             sem_wait(int, int);
+int             sem_signal(int, int);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

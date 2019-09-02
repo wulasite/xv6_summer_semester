@@ -103,3 +103,13 @@ memmove(void *vdst, void *vsrc, int n)
     *dst++ = *src++;
   return vdst;
 }
+
+int
+thread_create(void* function, void *arg, void *stack){
+    return clone(function, arg, stack);
+}
+
+int
+thread_join(void **stack){
+    return join(stack);
+}

@@ -28,6 +28,7 @@ main(void)
   consoleinit();   // I/O devices & their interrupts
   uartinit();      // serial port
   pinit();         // process table
+  seminit();       // semaphore table
   tvinit();        // trap vectors
   binit();         // buffer cache
   fileinit();      // file table
@@ -113,4 +114,7 @@ pde_t entrypgdir[NPDENTRIES] = {
 
 //PAGEBREAK!
 // Blank page.
-
+//PAGEBREAK!
+// Blank page.
+//PAGEBREAK!
+// Blank page.

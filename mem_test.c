@@ -15,27 +15,27 @@ int main(int argc, char const *argv[])
 	{
 	    pid = fork();
 	    if(pid < 0){
-	      printf(1, "cpu_test: fork failed\n");
+	      printf(1, "mem_test: fork failed\n");
 	      exit();
 	    }
 	    if(pid == 0){
 	      run(i);
 	      exit();
 	    }
-	    while((wpid=wait()) >= 0 && wpid != pid)
+	    while((wpid = wait()) >= 0 && wpid != pid)
 	      printf(1, "zombie!\n");
 			
 	}
 	int end = uptime();
-	int pass = end-start ;
+	int pass = end - start ;
 	printf(1, "--------------------mem type test end!-----------------------------\n");
-	printf(1, "---------------pass %dms--------------", pass*10);
+	printf(1, "--------------------pass %dms--------------------------------------\n", pass*10);
 	exit();
 }
 
 void run(int times)
 {
-	printf(1, "pid %d is running (%d times)!.\n",getpid(),times);
+	printf(1, "pid %d is running (%d times)!.\n", getpid(), times);
 	int i;
 	char * p;
 	p = (char *) malloc(sizeof(char) * 2001);

@@ -11,9 +11,11 @@
 #include "stat.h"
 #include "param.h"
 
+// jakob: recent versions of libc come with a static assert.
+// with any luck, that static_assert is just as good as this one.
 //#define static_assert(a, b) do { switch (0) case 0: case (a): ; } while (0)
 
-int nblocks = 985;
+int nblocks = (995-LOGSIZE);
 int nlog = LOGSIZE;
 int ninodes = 200;
 int size = 1024;

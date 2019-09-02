@@ -30,7 +30,7 @@ int main(int argc, char const *argv[])
 	int end = uptime();
 	int pass = end-start ;
 	printf(1, "--------------------io type test end!-----------------------------\n");
-	printf(1, "---------------pass %dms--------------", pass*10);
+	printf(1, "--------------------pass %dms-------------------------------------\n", pass*10);
 	exit();
 }
 
@@ -51,7 +51,7 @@ void run(int times)
 		return;
     }
 	if(write(fd, data, sizeof(data)) < 0) {
-		printf(2, "--------------------write error-----------------------------\n", fd);
+		printf(2, "--------------------write error---------------------------------------\n", fd);
 		return;
 	}
 	close(fd);

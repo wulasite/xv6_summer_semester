@@ -1,6 +1,7 @@
 #include "types.h"
 #include "x86.h"
 #include "defs.h"
+#include "date.h"
 #include "param.h"
 #include "memlayout.h"
 #include "mmu.h"
@@ -86,8 +87,82 @@ sys_uptime(void)
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
-  // cprintf("%d", xticks);
   return xticks;
 }
 
+// Halt (shutdown) the system by sending a special
+// signal to QEMU.
+// Based on: http://pdos.csail.mit.edu/6.828/2012/homework/xv6-syscall.html
+// and: https://github.com/t3rm1n4l/pintos/blob/master/devices/shutdown.c
+int
+sys_halt(void)
+{
+  char *p = "Shutdown";
+  for( ; *p; p++)
+    outw(0xB004, 0x2000);
+  return 0;
+}
 
+int
+sys_sem_init(void)
+{
+  int num, max;
+  if(argint(0, &num) < 0)
+    return -1;
+  if(argint(1, &max) < 0)
+    return -1;
+  return sem_init(num, max);
+}
+
+int
+sys_sem_destroy(void)
+{
+  int num;
+  if(argint(0, &num) < 0)
+    return -1;
+  return sem_destroy(num);
+}
+
+int
+sys_sem_wait(void)
+{
+  int num, count;
+  if(argint(0, &num) < 0)
+    return -1;
+  if(argint(1, &count) < 0)
+    return -1;
+  return sem_wait(num, count);
+}
+
+int
+sys_sem_signal(void)
+{
+  int num, count;
+  if(argint(0, &num) < 0)
+    return -1;
+  if(argint(1, &count) < 0)
+    return -1;
+  return sem_signal(num, count);
+}
+
+int
+sys_clone(void)
+{
+  int function, arg, stack;
+  if(argint(0, &function) < 0)
+    return -1;
+  if(argint(1, &arg) < 0)
+    return -1;
+  if(argint(2, &stack) < 0)
+    return -1;
+  return clone((void*)function, (void*)arg, (void*)stack);
+}
+
+int
+sys_join(void)
+{
+  int stack;
+  if(argint(0, &stack) < 0)
+    return -1;
+  return join((void**)stack);
+}

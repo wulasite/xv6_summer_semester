@@ -1,17 +1,6 @@
 // Segments in proc->gdt.
 #define NSEGS     7
 
- static const int prio_to_weight[40] = {
- /* -20 */ 88761, 71755, 56483, 46273, 36291,
- /* -15 */ 29154, 23254, 18705, 14949, 11916,
- /* -10 */ 9548, 7620, 6100, 4904, 3906,
- /* -5 */ 3121, 2501, 1991, 1586, 1277,
- /* 0 */ 1024, 820, 655, 526, 423,
- /* 5 */ 335, 272, 215, 172, 137,
- /* 10 */ 110, 87, 70, 56, 45,
- /* 15 */ 36, 29, 23, 18, 15,
- };
-
 // Per-CPU state
 struct cpu {
   uchar id;                    // Local APIC ID; index into cpus[] below
@@ -62,13 +51,17 @@ struct context {
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+//This enumerator will be used to determine the color of each process in the red-black tree
+enum procColor {RED, BLACK};		
+
+
 // Per-process state
 struct proc {
   uint sz;                     // Size of process memory (bytes)
   pde_t* pgdir;                // Page table
   char *kstack;                // Bottom of kernel stack for this process
   enum procstate state;        // Process state
-  volatile int pid;            // Process ID
+  int pid;                     // Process ID
   struct proc *parent;         // Parent process
   struct trapframe *tf;        // Trap frame for current syscall
   struct context *context;     // swtch() here to run process
@@ -77,8 +70,34 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  ulong vruntime;              // The vitual time
+  int isthread;                // Is thread or not
+  int stack;                   // thread's stack address
 
+/*
+  CFS Implementation:
+  -The red-black tree data structure will be used as the run queue for the Completely Fair Scheduler to chose processes.
+  -The CFS scheduler will determine which process to pick based on the virtual Runtime of a process.
+  
+*/
+  int virtualRuntime;    	//Elapsed time since it was scheduled      
+  int currentRuntime;		//Time the process has run			
+  int maximumExecutiontime;	//The target scheduling latency of each process per scheduling round
+  int niceValue;		//It is the variable that will be used to determine initial priority for process
+  int weightValue;		//Variable used to determine the process's maximumExecutiontime 			
+
+/*
+  Red-Black Tree data structure:
+  -Each process that is in the red-black tree will contain three pointers to processes that are the parent and two childern. 
+  -If the currently inserted process in the red-black tree run queue is the root, i.e. the only process in the red-black tree or is the highest process in the red-black tree, then the parent pointer will point to itself, and the left/right pointers will point to either null or another process if it is in the tree.
+  -Other processes in the red-black tree will have a pointer to a parent process, i.e those processes are children of a process closer to the root, and the left/right pointers either will point to NULL or processes.
+  -Each pointer pointing to null will be considered as a black node on the true. 
+  -A process in the red-black tree can be either red or black. 
+*/
+
+  enum procColor coloring;
+  struct proc *left;
+  struct proc *right;
+  struct proc *parentP;
 };
 
 // Process memory is laid out contiguously, low addresses first:
