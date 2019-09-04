@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
 			
 	}
 	int end = uptime();
-	int pass = end-start ;
+	int pass = end - start ;
 	printf(1, "--------------------io type test end!-----------------------------\n");
 	printf(1, "--------------------pass %dms-------------------------------------\n", pass*10);
 	exit();

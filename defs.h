@@ -125,6 +125,9 @@ int             join(void**);
 // swtch.S
 void            swtch(struct context**, struct context*);
 
+// pushkstack.S
+//void            pushkstack();
+
 // spinlock.c
 void            acquire(struct spinlock*);
 void            getcallerpcs(void*, uint*);

@@ -605,6 +605,58 @@ found:
   return p;
 }
 
+static struct proc*
+allocthread(void)
+{
+    struct proc *p;
+    char *sp;
+
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+        if(p->state == UNUSED)
+            goto found;
+    release(&ptable.lock);
+    return 0;
+
+    found:
+    p->state = EMBRYO;
+    p->pid = nextpid++;
+    release(&ptable.lock);
+
+    // Allocate kernel stack.
+    if((p->kstack = kalloc()) == 0){
+        p->state = UNUSED;
+        return 0;
+    }
+    sp = p->kstack + KSTACKSIZE;
+
+    // Leave room for trap frame.
+    sp -= sizeof *p->tf;
+    p->tf = (struct trapframe*)sp;
+
+    // Set up new context to start executing at forkret,
+    // which returns to trapret.
+    sp -= 4;
+    *(uint*)sp = (uint)trapret;
+
+    sp -= sizeof *p->context;
+    p->context = (struct context*)sp;
+    memset(p->context, 0, sizeof *p->context);
+    p->context->eip = (uint)forkret;
+
+    //Set up fields of the process that are used by the CFS, which include fields to implement red-black tree
+    p->virtualRuntime = 0;
+    p->currentRuntime = 0;
+    p->maximumExecutiontime = 0;
+    p->niceValue = 0;
+
+    p->left = 0;
+    p->right = 0;
+    p->parentP = 0;
+
+    return p;
+}
+
 //PAGEBREAK: 32
 // Set up first user process.
 void
@@ -1045,7 +1097,7 @@ clone(void* function, void *arg, void *stack)
   struct proc *np;
 
   // Allocate process.
-  if((np = allocproc()) == 0)
+  if((np = allocthread()) == 0)
     return -1;
 
   np->sz = proc->sz;
@@ -1068,6 +1120,7 @@ clone(void* function, void *arg, void *stack)
   // modified the thread indicator's value
   np->isthread = 1;
   // modified the stack
+
   np->stack = (int)stack;
   np->tf->esp = (int)stack + 4092; // move esp to the top of the new stack
   *((int *)(np->tf->esp)) = (int)arg; // push the argument

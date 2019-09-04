@@ -179,6 +179,7 @@ UPROGS=\
 	_cpu_test\
 	_mem_test\
 	_io_test\
+	_Ptest\
 
 fs.img: mkfs README.md $(UPROGS)
 	./mkfs fs.img README.md $(UPROGS)

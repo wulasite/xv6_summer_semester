@@ -1,5 +1,5 @@
 //
-// Created by 王珅祎 on 2019-09-02.
+// Created by 王珅祎 on 2019/9/4.
 //
 
 #include "types.h"
@@ -8,27 +8,20 @@
 #include "fs.h"
 #include "fcntl.h"
 
-#define TARGET_COUNT_PER_THREAD 50000
-#define SEMAPHORE_NUM 0  //使用sem_table的第几个信号量
+int SEMAPHORE_NUM = 5;//使用sem_table的第几个信号量
+int NUM_THREADS = 5;
 
-uint g_counter;
-int NUM_THREADS = 2;
-
-void *test(void *arg)
-{
+void *test(void *arg){
     int i;
     int counter;
 
-    sleep(10);
     printf(1, "thread %d: started...\n", *(int*)arg);
 
-    for (i=0; i<TARGET_COUNT_PER_THREAD; i++) {
+    for(i=0; i<TARGET_COUNT_PER_THREAD; i++){
         sem_wait(SEMAPHORE_NUM, 1);
 
         counter = g_counter;
-        sleep(0);
         counter++;
-        sleep(0);
         g_counter = counter;
 
         sem_signal(SEMAPHORE_NUM, 1);
@@ -39,31 +32,22 @@ void *test(void *arg)
 
 int main(int argc, char **argv)
 {
-    int i, j;
-    int sem_size;
-    int final_counter;
-    int final_target;
+    int sem_size = 1;
 
-    if (argc == 1){
-        sem_size = 1;
-    }else{
-        NUM_THREADS = atoi(argv[1]);
-//        sem_size = NUM_THREADS - 1;
-        sem_size = 1;
+    if (argc > 1){
+        SEMAPHORE_NUM = NUM_THREADS = atoi(argv[1]);
     }
     final_target = NUM_THREADS * TARGET_COUNT_PER_THREAD;
 
-    // Initialize semaphore to 1
-    if (sem_init(SEMAPHORE_NUM, sem_size) < 0)
-    {
-        printf(1, "main: error initializing semaphore %d\n", SEMAPHORE_NUM);
-        exit();
+    // Initialize all semaphore to 1
+    for(int i = 0; i < SEMAPHORE_NUM; i++){
+        if (sem_init(i, sem_size) < 0)
+        {
+            printf(1, "main: error initializing semaphore %d\n", SEMAPHORE_NUM);
+            exit();
+        }
+        printf(1, "main: initialized semaphore %d to %d\n", SEMAPHORE_NUM, sem_size);
     }
-
-    printf(1, "main: initialized semaphore %d to %d\n", SEMAPHORE_NUM, sem_size);
-
-    // Initialize counter
-    g_counter = 0;
 
     // Set up thread stuff
 
