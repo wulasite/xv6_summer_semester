@@ -27,4 +27,3 @@
 #define SYS_sem_signal  26
 #define SYS_clone  27
 #define SYS_join   28
-//#define SYS_CPUnum  29

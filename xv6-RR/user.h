@@ -30,7 +30,6 @@ int sem_wait(int, int);
 int sem_signal(int, int);
 int clone(void*, void*, void*);
 int join(void**);
-//int CPUnum(void);
 
 // ulib.c
 int stat(char*, struct stat*);

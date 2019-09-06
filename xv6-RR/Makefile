@@ -177,14 +177,10 @@ UPROGS=\
 	_shutdown\
 	_sem_test\
 	_thread_test\
-	_cpu_test\
-	_mem_test\
-	_io_test\
-	_Ptest\
 	_Stest\
 
-fs.img: mkfs README.md $(UPROGS)
-	./mkfs fs.img README.md $(UPROGS)
+fs.img: mkfs README $(UPROGS)
+	./mkfs fs.img README $(UPROGS)
 
 -include *.d
 
@@ -197,7 +193,7 @@ clean:
 
 # make a printout
 FILES = $(shell grep -v '^\#' runoff.list)
-PRINT = runoff.list runoff.spec README.md toc.hdr toc.ftr $(FILES)
+PRINT = runoff.list runoff.spec README toc.hdr toc.ftr $(FILES)
 
 xv6.pdf: $(PRINT)
 	./runoff
@@ -252,7 +248,7 @@ EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
 	printf.c umalloc.c\
-	README.md dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
+	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 
 dist:
@@ -283,5 +279,24 @@ tar:
 	mkdir -p /tmp/xv6
 	cp dist/* dist/.gdbinit.tmpl /tmp/xv6
 	(cd /tmp; tar cf - xv6) | gzip >xv6-rev5.tar.gz
+
+submit-help:
+	@echo "This makefile target is used to convieniently package your modifications for grading"
+	@echo "Type \"make submit netids=NETID1-NETID2 name=SECTION_NAME base=BASE_BRANCH\" to create a tarball."
+
+submit:
+ifndef netids
+	@echo "You must specify your netids, please type \"make submit-help\" for more details"
+else
+ifndef name
+	@echo "You must specify a name, please type \"make submit-help\" for more details"
+else
+ifndef base
+	@echo "You must specify a base, please type \"make submit-help\" for more details"
+else
+	@./package_patches.sh $(netids) $(name) $(base)
+endif
+endif
+endif
 
 .PHONY: dist-test dist

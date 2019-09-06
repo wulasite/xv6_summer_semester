@@ -35,9 +35,9 @@ int main(int argc, char const *argv[])
 }
 
 
-void run(int times) 
+void run(int times)
 {
-	printf(1, "pid %d is running (%d times)!.\n",getpid(),times);
+	printf(1, "pid %d is running (%d times)!.\n",getpid(), times);
 	// code
 	int fd;
 	char data[512];
