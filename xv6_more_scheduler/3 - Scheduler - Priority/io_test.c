@@ -5,32 +5,35 @@
 #include "fcntl.h"
 
 void run(int times);
-int times = 21;
+int times = 4;
 
 int main(int argc, char const *argv[])
 {
 	int pid, wpid;
-	printf(1, "--------------------io type test start!-----------------------------\n" );
-	int start = uptime();
-  	for (int i = 0; i < times; ++i)
+	// printf(1, "--------------------io type test start!-----------------------------\n" );
+	int x[3] = {10, 20, 50};
+    int i = 0;
+  	for (int y=x[i]; i<3; y=x[i])
 	{
+		i++;
+		int start = uptime();
 	    pid = fork();
 	    if(pid < 0){
 	      printf(1, "io_test: fork failed\n");
 	      exit();
 	    }
 	    if(pid == 0){
-	      run(i);
+	      run(y);
 	      exit();
 	    }
 	    while((wpid=wait()) >= 0 && wpid != pid)
 	      printf(1, "zombie!\n");
-			
+		int end = uptime();
+		int pass = end-start ;
+		// printf(1, "--------------------io type test end!-----------------------------\n");
+		printf(1, "--------------------scale %d io type test pass %dms--------------\n", y, pass*10/times);
 	}
-	int end = uptime();
-	int pass = end-start ;
-	printf(1, "--------------------io type test end!-----------------------------\n");
-	printf(1, "---------------pass %dms--------------", pass*10/21);
+	
 	exit();
 }
 
@@ -40,7 +43,8 @@ void run(int times)
 	// printf(1, "pid %d is running (%d times)!.\n",getpid(),times);
 	// code
 	int fd;
-	char data[512];
+
+	char data[50 * times];
 	char filename[] = "test0";
 
     filename[4] += times;

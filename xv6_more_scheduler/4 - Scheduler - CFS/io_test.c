@@ -5,14 +5,14 @@
 #include "fcntl.h"
 
 void run(int times);
-int times = 21;
+int times = 4;
 
 int main(int argc, char const *argv[])
 {
 	int pid, wpid;
-	printf(1, "--------------------io type test start!-----------------------------\n" );
+	// printf(1, "--------------------io type test start!-----------------------------\n" );
 	int start = uptime();
-  	for (int i = 0; i < times; ++i)
+  	for (int i = 1; i <= times; ++i)
 	{
 	    pid = fork();
 	    if(pid < 0){
@@ -29,8 +29,8 @@ int main(int argc, char const *argv[])
 	}
 	int end = uptime();
 	int pass = end-start ;
-	printf(1, "--------------------io type test end!-----------------------------\n");
-	printf(1, "---------------pass %dms--------------", pass*10/21);
+	// printf(1, "--------------------io type test end!-----------------------------\n");
+	printf(1, "--------------------io type test pass %dms--------------\n", pass*10/times);
 	exit();
 }
 
@@ -40,7 +40,8 @@ void run(int times)
 	// printf(1, "pid %d is running (%d times)!.\n",getpid(),times);
 	// code
 	int fd;
-	char data[512];
+
+	char data[times * 50];
 	char filename[] = "test0";
 
     filename[4] += times;

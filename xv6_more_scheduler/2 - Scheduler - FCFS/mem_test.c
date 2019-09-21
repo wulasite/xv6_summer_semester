@@ -4,12 +4,12 @@
 #include "fs.h"
 
 void run(int times);
-int times = 21;
+int times = 8;
 
 int main(int argc, char const *argv[])
 {
 	int pid, wpid;
-	printf(1, "--------------------mem type test start!-----------------------------\n");
+	// printf(1, "-------------------- start!-----------------------------\n");
 	int start = uptime();
 	for (int i = 0; i < times; ++i)
 	{
@@ -28,8 +28,7 @@ int main(int argc, char const *argv[])
 	}
 	int end = uptime();
 	int pass = end-start ;
-	printf(1, "--------------------mem type test end!-----------------------------\n");
-	printf(1, "---------------pass %dms--------------", pass*10/21);
+	printf(1, "--------------------mem type test pass %dms--------------\n", pass*10/times);
 	exit();
 }
 
@@ -43,7 +42,7 @@ void run(int times)
 		*(p + i) = i&0x0f;
 		// printf(1, "%s ", p[i]);
 	}
-	for(i = 0; i <= 1; i++){
+	for(i = 0; i <= 1000; i++){
 		*(p + i + 1000) = (*(p + i))&0x0f;
 	}
 	for(i = 0; i <= 1000; i++){
